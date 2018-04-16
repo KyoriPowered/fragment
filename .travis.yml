@@ -1,0 +1,21 @@
+language: java
+jdk:
+  - oraclejdk8
+
+dist: trusty
+sudo: false
+env:
+  global:
+    - secure: "GcLb4ka3vAxqql1qlycHYRPmLKPXNDPJOTBdcZDRuT7Eo+Ndc0joXaL43HhKsHUPKxLJ1BvouQResE+G32GJZYGsbsG/fF5BwzAOnXVJgNvGhsZuDWd4rU7qPOhpIZRYZmu+w5j3km8PJ5srpTab25vSOf1zgZtbXgqug+Yv39aiWyvzXHhgWJmC9tOqETtrB1SMYIhv5rHWFXhYiuCmOOtfyUHWOQiPGjpz6NPB8jUUqwYAsxsjGPhZ4DTMTFO/OAqQKmCvtMu+CwkiupPy9Lnubm5v2XMvdJ5hNBhkQ6RT52b0pFR+u0JG/7pA6BmjBR5yFg4ktYhufQJMSGkq/O+yCxF/UllY1l5Ih9jMVHkuDMkfGWa2Z8cRO3TKwY0+pSvBw8rrh47dZsPvJFAKpSgjKo/p/3cBcDzU+UbQF1mISlxl64fojN1vcOeGIfkqB0YxT2gvzSe+IgONro6V6BccRqhcxMSnAS1hyMDBONbJe/lT7sHS1NMSGg/Hvz8pO8uTHDtt3LT7xIyCLXyIDHYhZg4nIZiXacuk/SaZSN8GpSmzOWcUvAlBgfFxAA0kSB6TJpVeB3pCfpTsCNU/G4Gkm0UP8SnIde09we3/c2inDzl0WyO8hRiIEVT3o9BSw33T1UCiobYsPiJmiYigjG+eCaugWIDuL7svrfKDaTg="
+    - secure: "50k3YjP4/PnTTRYzsoNTsK4XCo+bKhlSEs+UelKHgdh2YpO2eMQVC5mxo6Byrso3/gWMxU3hYRo1w2Z5vc81AnMVtu63BqyW7BFO9SB4zv5x4Rf31S1YaRgLJbcxi/tQxGxUCIszXdBCGl6pDxiGlNmQ8W8jYGGfSKcW0vk7C6niCt8IvQFD9174aU+GBU78vuKe0aaqvJ1cijDb0+Hu64pBZ5R1zC4AX5Ymb71GAP76XcCTHvNUgu1Ev1a7u8hqj1bMeedxULvNHBuYgDQYjD1FxV1wCWGIrJcbcFVGqb4HE1Vfl8FhjOGor6nQ8vkpAtqybjibF+5LhIPew/NwMTcrvdLyWzqUEpdp4nrUnngU2C0AeeaUrJp/Ki7Kzd4C2fFjmGaNlW5zNUACNQytslckdtLgSH7osClJ9zMzbx/TQ63O1JhJTskYDTIVXxNveBnV1+QDLwLslN2ly1wUEBT72YLrLs5sfXmcklxxxYSuKc8lCCTRgJ/ymcSxJplkEzMPmCwZaz/1p9AImkVPTL2iZWYBbC89HGE3I8sxwoISjoQexFzc8mHrSUCP9K3Gs5gEGwaIGbj3lge7QCSVe6LbdU/PYhAm9+c5/2EIFaDJQQdyuIaMxbV84uY+SY7mSWXseicUDk/OJ51/DZWx0K/jWIwbkt7AjnWcJE4o8xs="
+
+install: true
+script: ./.travis.sh
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
