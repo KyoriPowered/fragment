@@ -21,42 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
+package net.kyori.fragment.filter.impl;
 
-import net.kyori.fragment.feature.Feature;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.kyori.fragment.filter.Filter;
+import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.Parser;
 
-/**
- * A filter.
- */
-public interface Filter extends Feature {
-  String REFERENCE_ID = "filter";
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-  /**
-   * Query this filter for a response.
-   *
-   * @param query the query
-   * @return the response
-   */
-  @NonNull FilterResponse query(final @NonNull FilterQuery query);
+@Singleton
+public final class NotFilterParser implements Parser<NotFilter> {
+  private final Parser<Filter> parser;
 
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#ALLOW allowed} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if allowed, {@code false} otherwise
-   */
-  default boolean allowed(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.ALLOW;
+  @Inject
+  private NotFilterParser(final Parser<Filter> parser) {
+    this.parser = parser;
   }
 
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#DENY denied} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if denied, {@code false} otherwise
-   */
-  default boolean denied(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.DENY;
+  @Override
+  public NotFilter throwingParse(final Node node) {
+    return new NotFilter(this.parser.parse(node.elements().one().need()));
   }
 }

@@ -23,40 +23,22 @@
  */
 package net.kyori.fragment.filter;
 
-import net.kyori.fragment.feature.Feature;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.kyori.fragment.filter.impl.AllFilterParser;
+import net.kyori.fragment.filter.impl.AnyFilterParser;
+import net.kyori.fragment.filter.impl.FilterReferenceParser;
+import net.kyori.fragment.filter.impl.NotFilterParser;
+import net.kyori.fragment.parser.ParserBinder;
+import net.kyori.violet.AbstractModule;
 
-/**
- * A filter.
- */
-public interface Filter extends Feature {
-  String REFERENCE_ID = "filter";
+public final class FilterModule extends AbstractModule implements FilterBinder, ParserBinder {
+  @Override
+  protected void configure() {
+    this.bindParser(Filter.class).to(RootFilterParserImpl.class);
 
-  /**
-   * Query this filter for a response.
-   *
-   * @param query the query
-   * @return the response
-   */
-  @NonNull FilterResponse query(final @NonNull FilterQuery query);
+    this.bindFilter(Filter.REFERENCE_ID).to(FilterReferenceParser.class);
 
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#ALLOW allowed} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if allowed, {@code false} otherwise
-   */
-  default boolean allowed(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.ALLOW;
-  }
-
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#DENY denied} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if denied, {@code false} otherwise
-   */
-  default boolean denied(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.DENY;
+    this.bindFilter("all").to(AllFilterParser.class);
+    this.bindFilter("any").to(AnyFilterParser.class);
+    this.bindFilter("not").to(NotFilterParser.class);
   }
 }

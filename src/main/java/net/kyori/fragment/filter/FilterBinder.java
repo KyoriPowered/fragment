@@ -23,40 +23,14 @@
  */
 package net.kyori.fragment.filter;
 
-import net.kyori.fragment.feature.Feature;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import com.google.inject.TypeLiteral;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.MapBinder;
+import net.kyori.violet.VBinder;
+import net.kyori.xml.parser.Parser;
 
-/**
- * A filter.
- */
-public interface Filter extends Feature {
-  String REFERENCE_ID = "filter";
-
-  /**
-   * Query this filter for a response.
-   *
-   * @param query the query
-   * @return the response
-   */
-  @NonNull FilterResponse query(final @NonNull FilterQuery query);
-
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#ALLOW allowed} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if allowed, {@code false} otherwise
-   */
-  default boolean allowed(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.ALLOW;
-  }
-
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#DENY denied} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if denied, {@code false} otherwise
-   */
-  default boolean denied(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.DENY;
+public interface FilterBinder extends VBinder {
+  default LinkedBindingBuilder<Parser<? extends Filter>> bindFilter(final String key) {
+    return MapBinder.newMapBinder(this.binder(), new TypeLiteral<String>() {}, new TypeLiteral<Parser<? extends Filter>>() {}).addBinding(key);
   }
 }
