@@ -23,19 +23,25 @@
  */
 package net.kyori.fragment.parser;
 
+import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
-import net.kyori.violet.ForwardingBinder;
 import net.kyori.violet.FriendlyTypeLiteral;
 import net.kyori.violet.TypeArgument;
 import net.kyori.xml.parser.Parser;
 
-public interface ParserBinder extends ForwardingBinder {
-  default <T> AnnotatedBindingBuilder<Parser<T>> bindParser(final Class<T> type) {
-    return this.bind(new FriendlyTypeLiteral<Parser<T>>() {}.where(new TypeArgument<T>(type) {}));
+public class ParserBinder {
+  private final Binder binder;
+
+  public ParserBinder(final Binder binder) {
+    this.binder = binder;
   }
 
-  default <T> AnnotatedBindingBuilder<Parser<T>> bindParser(final TypeLiteral<T> type) {
-    return this.bind(new FriendlyTypeLiteral<Parser<T>>() {}.where(new TypeArgument<T>(type) {}));
+  public <T> AnnotatedBindingBuilder<Parser<T>> bindParser(final Class<T> type) {
+    return this.binder.bind(new FriendlyTypeLiteral<Parser<T>>() {}.where(new TypeArgument<T>(type) {}));
+  }
+
+  public <T> AnnotatedBindingBuilder<Parser<T>> bindParser(final TypeLiteral<T> type) {
+    return this.binder.bind(new FriendlyTypeLiteral<Parser<T>>() {}.where(new TypeArgument<T>(type) {}));
   }
 }

@@ -23,14 +23,20 @@
  */
 package net.kyori.fragment.filter;
 
+import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
-import net.kyori.violet.VBinder;
 import net.kyori.xml.parser.Parser;
 
-public interface FilterBinder extends VBinder {
-  default LinkedBindingBuilder<Parser<? extends Filter>> bindFilter(final String key) {
-    return MapBinder.newMapBinder(this.binder(), new TypeLiteral<String>() {}, new TypeLiteral<Parser<? extends Filter>>() {}).addBinding(key);
+public class FilterBinder {
+  private final Binder binder;
+
+  public FilterBinder(final Binder binder) {
+    this.binder = binder;
+  }
+
+  public LinkedBindingBuilder<Parser<? extends Filter>> bindFilter(final String key) {
+    return MapBinder.newMapBinder(this.binder, new TypeLiteral<String>() {}, new TypeLiteral<Parser<? extends Filter>>() {}).addBinding(key);
   }
 }

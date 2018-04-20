@@ -30,15 +30,16 @@ import net.kyori.fragment.filter.impl.NotFilterParser;
 import net.kyori.fragment.parser.ParserBinder;
 import net.kyori.violet.AbstractModule;
 
-public final class FilterModule extends AbstractModule implements FilterBinder, ParserBinder {
+public final class FilterModule extends AbstractModule {
   @Override
   protected void configure() {
-    this.bindParser(Filter.class).to(RootFilterParserImpl.class);
+    final ParserBinder parsers = new ParserBinder(this.binder());
+    parsers.bindParser(Filter.class).to(RootFilterParserImpl.class);
 
-    this.bindFilter(Filter.REFERENCE_ID).to(FilterReferenceParser.class);
-
-    this.bindFilter("all").to(AllFilterParser.class);
-    this.bindFilter("any").to(AnyFilterParser.class);
-    this.bindFilter("not").to(NotFilterParser.class);
+    final FilterBinder filters = new FilterBinder(this.binder());
+    filters.bindFilter(Filter.REFERENCE_ID).to(FilterReferenceParser.class);
+    filters.bindFilter("all").to(AllFilterParser.class);
+    filters.bindFilter("any").to(AnyFilterParser.class);
+    filters.bindFilter("not").to(NotFilterParser.class);
   }
 }

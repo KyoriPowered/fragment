@@ -26,14 +26,15 @@ package net.kyori.fragment.parser.primitive.number;
 import net.kyori.fragment.parser.ParserBinder;
 import net.kyori.violet.AbstractModule;
 
-public final class NumberParserModule extends AbstractModule implements ParserBinder {
+public final class NumberParserModule extends AbstractModule {
   @Override
   protected void configure() {
-    this.bindParser(Byte.class).to(ByteParser.class);
-    this.bindParser(Double.class).to(DoubleParser.class);
-    this.bindParser(Float.class).to(FloatParser.class);
-    this.bindParser(Integer.class).to(IntegerParser.class);
-    this.bindParser(Long.class).to(LongParser.class);
-    this.bindParser(Short.class).to(ShortParser.class);
+    final ParserBinder parsers = new ParserBinder(this.binder());
+    parsers.bindParser(Byte.class).to(ByteParser.class);
+    parsers.bindParser(Double.class).to(DoubleParser.class);
+    parsers.bindParser(Float.class).to(FloatParser.class);
+    parsers.bindParser(Integer.class).to(IntegerParser.class);
+    parsers.bindParser(Long.class).to(LongParser.class);
+    parsers.bindParser(Short.class).to(ShortParser.class);
   }
 }
