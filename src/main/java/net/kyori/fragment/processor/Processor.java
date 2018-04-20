@@ -23,8 +23,9 @@
  */
 package net.kyori.fragment.processor;
 
+import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 
 public interface Processor {
-  void process(final Node node);
+  void process(final Node node) throws XMLException;
 }
