@@ -23,9 +23,9 @@
  */
 package net.kyori.fragment.filter;
 
-import net.kyori.fragment.filter.test.TestFilter;
-import net.kyori.fragment.filter.test.TestQuery;
-import net.kyori.fragment.filter.test.TestQuery2;
+import net.kyori.fragment.test.TestFilter;
+import net.kyori.fragment.test.TestQuery;
+import net.kyori.fragment.test.TestQuery2;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

@@ -23,12 +23,13 @@
  */
 package net.kyori.fragment.filter;
 
+import net.kyori.fragment.feature.Feature;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A filter.
  */
-public interface Filter {
+public interface Filter extends Feature {
   /**
    * Query this filter for a response.
    *

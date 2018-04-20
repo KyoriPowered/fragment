@@ -21,27 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter.impl;
+package net.kyori.fragment.test;
 
-import net.kyori.fragment.filter.FilterResponse;
-import net.kyori.fragment.test.TestFilter;
-import net.kyori.fragment.test.TestQuery;
-import org.junit.jupiter.api.Test;
+import net.kyori.fragment.filter.FilterQuery;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-class NotFilterTest {
-  @Test
-  void testNot() {
-    final TestFilter filter = new TestFilter(69);
-    assertEquals(FilterResponse.ALLOW, filter.query((TestQuery) () -> 69));
-    assertEquals(FilterResponse.DENY, new NotFilter(filter).query((TestQuery) () -> 69));
-  }
-
-  @Test
-  void testNotNot() {
-    final TestFilter filter = new TestFilter(69);
-    assertEquals(FilterResponse.ALLOW, filter.query((TestQuery) () -> 69));
-    assertEquals(FilterResponse.ALLOW, new NotFilter(new NotFilter(filter)).query((TestQuery) () -> 69));
-  }
+public interface TestQuery2 extends FilterQuery {
 }

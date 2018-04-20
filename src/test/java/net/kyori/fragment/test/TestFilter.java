@@ -21,9 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter.test;
+package net.kyori.fragment.test;
 
 import net.kyori.fragment.filter.FilterQuery;
+import net.kyori.fragment.filter.FilterResponse;
+import net.kyori.fragment.filter.TypedFilter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public interface TestQuery2 extends FilterQuery {
+public class TestFilter implements TypedFilter<TestQuery> {
+  private final int number;
+
+  public TestFilter(final int number) {
+    this.number = number;
+  }
+
+  @Override
+  public boolean queryable(final FilterQuery query) {
+    return query instanceof TestQuery;
+  }
+
+  @Override
+  public FilterResponse typedQuery(final @NonNull TestQuery query) {
+    return FilterResponse.from(this.number == query.number());
+  }
 }

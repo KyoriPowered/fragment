@@ -25,8 +25,8 @@ package net.kyori.fragment.filter.impl;
 
 import net.kyori.fragment.filter.Filter;
 import net.kyori.fragment.filter.FilterResponse;
-import net.kyori.fragment.filter.test.TestFilter;
-import net.kyori.fragment.filter.test.TestQuery;
+import net.kyori.fragment.test.TestFilter;
+import net.kyori.fragment.test.TestQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

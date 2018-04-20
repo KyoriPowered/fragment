@@ -21,10 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter.test;
+package net.kyori.fragment.feature.parser;
 
-import net.kyori.fragment.filter.FilterQuery;
+import com.google.inject.TypeLiteral;
+import net.kyori.fragment.feature.Feature;
+import net.kyori.fragment.feature.context.FeatureContext;
+import net.kyori.xml.XMLException;
+import net.kyori.xml.node.Node;
 
-public interface TestQuery extends FilterQuery {
-  int number();
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+public abstract class AbstractFeatureParser<F extends Feature> implements FeatureParser<F> {
+  @Inject private TypeLiteral<F> type;
+  @Inject private Provider<FeatureContext> context;
+
+  @Override
+  public F throwingParse(final Node node) throws XMLException {
+    if(node.attribute(Feature.ID_ATTRIBUTE_NAME).isPresent()) {
+      return this.ref(node);
+    }
+    final F feature = this.parseFeature(node);
+    return this.context.get().add(this.type(), node, feature);
+  }
+
+  protected abstract F parseFeature(final Node node) throws XMLException;
+
+  protected F ref(final Node node) throws XMLException {
+    return this.context.get().get(this.type(), node);
+  }
+
+  private Class<F> type() {
+    return (Class<F>) this.type.getRawType();
+  }
 }
