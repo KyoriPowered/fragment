@@ -29,7 +29,9 @@ import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A feature context is responsible for storing features for referencing.
@@ -78,7 +80,21 @@ public interface FeatureContext {
    * @param <F> the feature type
    * @return the feature
    */
-  <F> @NonNull F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature);
+  default <F> @NonNull F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature) {
+    return this.add(type, node, feature, Collections.emptySet());
+  }
+
+  /**
+   * Defines a feature with this context.
+   *
+   * @param type the feature type
+   * @param node the node with the {@link Feature#ID_ATTRIBUTE_NAME id attribute}
+   * @param feature the feature
+   * @param flags the flags
+   * @param <F> the feature type
+   * @return the feature
+   */
+  <F> @NonNull F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature, final Set<Flag> flags);
 
   /**
    * Defines a feature with this context.
@@ -91,7 +107,23 @@ public interface FeatureContext {
    * @deprecated use {@link #add(Class, Node, Object)} when you have the node defining the feature present
    */
   @Deprecated
-  <F> @NonNull F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature);
+  default <F> @NonNull F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature) {
+    return this.add(type, id, feature, Collections.emptySet());
+  }
+
+  /**
+   * Defines a feature with this context.
+   *
+   * @param type the feature type
+   * @param id the feature id
+   * @param feature the feature
+   * @param flags the flags
+   * @param <F> the feature type
+   * @return the feature
+   * @deprecated use {@link #add(Class, Node, Object)} when you have the node defining the feature present
+   */
+  @Deprecated
+  <F> @NonNull F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature, final Set<Flag> flags);
 
   /**
    * Validate this feature context.
@@ -99,4 +131,8 @@ public interface FeatureContext {
    * @return a list of exceptions
    */
   @NonNull List<XMLException> validate();
+
+  enum Flag {
+    ADD_WITHOUT_ID;
+  }
 }

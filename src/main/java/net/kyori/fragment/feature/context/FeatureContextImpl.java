@@ -25,6 +25,8 @@ package net.kyori.fragment.feature.context;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ForwardingList;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.proxy.Proxied;
 import net.kyori.xml.XMLException;
@@ -37,11 +39,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FeatureContextImpl implements FeatureContext {
   protected final List<FeatureContextEntry<?>> features = new ArrayList<>();
-  protected final Map<String, FeatureContextEntry<?>> featuresById = new HashMap<>();
+  protected final Table<Class<?>, String, FeatureContextEntry<?>> featuresById = HashBasedTable.create();
   private final Map<Class<?>, FeatureList<?>> featureLists = new HashMap<>();
 
   @Override
@@ -85,29 +88,39 @@ public class FeatureContextImpl implements FeatureContext {
   }
 
   @Override
-  public <F> F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature) {
-    return this.add(type, node.attribute(Feature.ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature);
+  public <F> F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature, final Set<Flag> flags) {
+    return this.add(type, node.attribute(Feature.ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature, flags);
   }
 
   @Override
-  public <F> F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature) {
+  public <F> F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature, final Set<Flag> flags) {
     // Don't insert a proxied feature.
     if(feature instanceof Proxied) {
       return feature;
     }
 
     // This feature has an id, and can be referenced.
-    this.feature(type, id).define(feature);
-    this.features(type).ifPresent(FeatureList::invalidate);
+    if(id != null || flags.contains(Flag.ADD_WITHOUT_ID)) {
+      this.feature(type, id).define(feature);
+      this.features(type).ifPresent(FeatureList::invalidate);
+    }
 
     return feature;
   }
 
   protected <F> FeatureContextEntry<F> feature(final Class<F> type, final @Nullable String id) {
+    FeatureContextEntry<F> entry;
     if(id != null) {
-      return (FeatureContextEntry<F>) this.featuresById.computeIfAbsent(id, key -> this.createFeature(type, id));
+      entry = (FeatureContextEntry<F>) this.featuresById.get(type, id);
+      if(entry == null) {
+        entry = this.createFeature(type, id);
+        this.featuresById.put(type, id, entry);
+      }
+      return entry;
+    } else {
+      entry = this.createFeature(type, id);
     }
-    return this.createFeature(type, id);
+    return entry;
   }
 
   private <F> FeatureContextEntry<F> createFeature(final Class<F> type, final @Nullable String id) {
