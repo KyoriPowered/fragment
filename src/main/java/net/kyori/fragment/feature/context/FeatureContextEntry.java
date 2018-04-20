@@ -28,6 +28,7 @@ import net.kyori.fragment.feature.ProxiedFeature;
 import net.kyori.fragment.proxy.MethodHandleInvocationHandler;
 import net.kyori.fragment.proxy.Proxied;
 import net.kyori.xml.node.Node;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Method;
@@ -48,21 +49,21 @@ public class FeatureContextEntry<F> {
   /**
    * The id used for referencing this feature.
    */
-  @Nullable private final String id;
+  private final @Nullable String id;
   /**
    * The feature.
    */
-  @Nullable private F feature;
+  private @MonotonicNonNull F feature;
   /**
    * The proxied feature.
    */
-  @Nullable private F proxiedFeature;
+  private @Nullable F proxiedFeature;
   /**
    * A list of nodes referencing this feature.
    */
   final List<Node> references = new ArrayList<>();
 
-  FeatureContextEntry(final Class<F> type, @Nullable final String id) {
+  FeatureContextEntry(final Class<F> type, final @Nullable String id) {
     this.type = type;
     this.id = id;
   }
@@ -97,9 +98,8 @@ public class FeatureContextEntry<F> {
   private F proxy() {
     if(this.proxiedFeature == null) {
       class ProxiedFeatureImpl extends MethodHandleInvocationHandler {
-        @Nullable
         @Override
-        protected Object object(final Method method) {
+        protected @Nullable Object object(final Method method) {
           return FeatureContextEntry.this.feature();
         }
       }
