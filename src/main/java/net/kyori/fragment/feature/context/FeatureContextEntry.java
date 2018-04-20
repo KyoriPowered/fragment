@@ -26,6 +26,7 @@ package net.kyori.fragment.feature.context;
 import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.feature.ProxiedFeature;
 import net.kyori.fragment.proxy.MethodHandleInvocationHandler;
+import net.kyori.fragment.proxy.Proxied;
 import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -39,7 +40,7 @@ import java.util.List;
  *
  * @param <F> the feature type
  */
-public class FeatureContextEntry<F extends Feature> {
+public class FeatureContextEntry<F> {
   /**
    * The feature type.
    */
@@ -98,12 +99,20 @@ public class FeatureContextEntry<F extends Feature> {
           return FeatureContextEntry.this.feature();
         }
       }
-      this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), new Class<?>[]{
-        this.type,
-        ProxiedFeature.class
-      }, new ProxiedFeatureImpl());
+      this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), this.proxyClasses(), new ProxiedFeatureImpl());
     }
     return this.proxiedFeature;
+  }
+
+  private Class<?>[] proxyClasses() {
+    final List<Class<?>> classes = new ArrayList<>(2);
+    classes.add(this.type);
+    if(Feature.class.isAssignableFrom(this.type)) {
+      classes.add(ProxiedFeature.class);
+    } else {
+      classes.add(Proxied.class);
+    }
+    return classes.toArray(new Class<?>[classes.size()]);
   }
 
   private F feature() {

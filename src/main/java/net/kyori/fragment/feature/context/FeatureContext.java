@@ -46,7 +46,7 @@ public interface FeatureContext {
    * @return the feature
    * @throws XMLException if {@code node} does not have an {@link Feature#ID_ATTRIBUTE_NAME id attribute}
    */
-  <F extends Feature> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException;
+  <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException;
 
   /**
    * Gets a feature.
@@ -58,7 +58,7 @@ public interface FeatureContext {
    * @param <F> the feature type
    * @return the feature
    */
-  <F extends Feature> @NonNull F get(final @NonNull Class<F> type, final @NonNull String id);
+  <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull String id);
 
   /**
    * Defines a feature with this context.
@@ -69,7 +69,7 @@ public interface FeatureContext {
    * @param <F> the feature type
    * @return the feature
    */
-  <F extends Feature> @NonNull F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature);
+  <F> @NonNull F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature);
 
   /**
    * Defines a feature with this context.
@@ -79,10 +79,10 @@ public interface FeatureContext {
    * @param feature the feature
    * @param <F> the feature type
    * @return the feature
-   * @deprecated use {@link #add(Class, Node, Feature)} when you have the node defining the feature present
+   * @deprecated use {@link #add(Class, Node, Object)} when you have the node defining the feature present
    */
   @Deprecated
-  <F extends Feature> @NonNull F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature);
+  <F> @NonNull F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature);
 
   /**
    * Validate this feature context.

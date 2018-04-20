@@ -37,26 +37,26 @@ import java.util.List;
 import java.util.Map;
 
 public class FeatureContextImpl implements FeatureContext {
-  protected final Map<String, FeatureContextEntry<? extends Feature>> features = new HashMap<>();
+  protected final Map<String, FeatureContextEntry<?>> features = new HashMap<>();
 
   @Override
-  public <F extends Feature> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException {
+  public <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException {
     final Node id = node.requireAttribute(Feature.ID_ATTRIBUTE_NAME);
     return this.feature(type, id.value()).ref(node).get();
   }
 
   @Override
-  public <F extends Feature> @NonNull F get(final @NonNull Class<F> type, final @NonNull String id) {
+  public <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull String id) {
     return this.feature(type, id).get();
   }
 
   @Override
-  public <F extends Feature> F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature) {
+  public <F> F add(final @NonNull Class<F> type, final @NonNull Node node, final @NonNull F feature) {
     return this.add(type, node.attribute(Feature.ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature);
   }
 
   @Override
-  public <F extends Feature> F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature) {
+  public <F> F add(final @NonNull Class<F> type, final @Nullable String id, final @NonNull F feature) {
     // Don't insert a proxied feature.
     if(feature instanceof Proxied) {
       return feature;
@@ -70,7 +70,7 @@ public class FeatureContextImpl implements FeatureContext {
     return feature;
   }
 
-  protected <F extends Feature> FeatureContextEntry<F> feature(final Class<F> type, final String id) {
+  protected <F> FeatureContextEntry<F> feature(final Class<F> type, final String id) {
     return (FeatureContextEntry<F>) this.features.computeIfAbsent(id, key -> new FeatureContextEntry<>(type, id));
   }
 
