@@ -40,8 +40,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FeatureContextImpl implements FeatureContext {
-  protected final Map<String, FeatureContextEntry<?>> features = new HashMap<>();
-  protected final Map<Class<?>, FeatureList<?>> featureLists = new HashMap<>();
+  protected final List<FeatureContextEntry<?>> features = new ArrayList<>();
+  protected final Map<String, FeatureContextEntry<?>> featuresById = new HashMap<>();
+  private final Map<Class<?>, FeatureList<?>> featureLists = new HashMap<>();
 
   @Override
   public <F> @NonNull List<F> all(final @NonNull Class<F> type) {
@@ -63,7 +64,7 @@ public class FeatureContextImpl implements FeatureContext {
     @Override
     protected List<F> delegate() {
       if(this.list == null) {
-        this.list = FeatureContextImpl.this.features.values().stream()
+        this.list = FeatureContextImpl.this.features.stream()
           .filter(feature -> feature.is(this.type))
           .map(feature -> (F) feature.get())
           .collect(Collectors.toList());
@@ -96,26 +97,33 @@ public class FeatureContextImpl implements FeatureContext {
     }
 
     // This feature has an id, and can be referenced.
-    if(id != null) {
-      this.feature(type, id).define(feature);
-      this.features(type).ifPresent(FeatureList::invalidate);
-    }
+    this.feature(type, id).define(feature);
+    this.features(type).ifPresent(FeatureList::invalidate);
 
     return feature;
   }
 
-  protected <F> FeatureContextEntry<F> feature(final Class<F> type, final String id) {
-    return (FeatureContextEntry<F>) this.features.computeIfAbsent(id, key -> new FeatureContextEntry<>(type, id));
+  protected <F> FeatureContextEntry<F> feature(final Class<F> type, final @Nullable String id) {
+    if(id != null) {
+      return (FeatureContextEntry<F>) this.featuresById.computeIfAbsent(id, key -> this.createFeature(type, id));
+    }
+    return this.createFeature(type, id);
   }
 
-  protected <F> Optional<FeatureList<F>> features(final Class<F> type) {
+  private <F> FeatureContextEntry<F> createFeature(final Class<F> type, final @Nullable String id) {
+    final FeatureContextEntry<F> entry = new FeatureContextEntry<>(type, id);
+    this.features.add(entry);
+    return entry;
+  }
+
+  private <F> Optional<FeatureList<F>> features(final Class<F> type) {
     return Optional.ofNullable((FeatureList<F>) this.featureLists.get(type));
   }
 
   @Override
   public @NonNull List<XMLException> validate() {
     final List<XMLException> exceptions = new ArrayList<>();
-    for(final FeatureContextEntry<?> entry : this.features.values()) {
+    for(final FeatureContextEntry<?> entry : this.features) {
       if(entry.virtual()) {
         entry.references.forEach(reference -> exceptions.add(new FeatureNotDefinedException(reference, "feature of type " + entry.toString() + " has not been defined")));
       }

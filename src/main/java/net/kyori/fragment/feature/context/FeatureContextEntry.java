@@ -128,6 +128,6 @@ public class FeatureContextEntry<F> {
 
   @Override
   public String toString() {
-    return this.type.getName() + " with id '" + this.id + '\'';
+    return this.type.getName() + (this.id != null ? (" with id '" + this.id + '\'') : "");
   }
 }
