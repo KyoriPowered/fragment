@@ -24,56 +24,34 @@
 package net.kyori.fragment.feature.context;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ForwardingList;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import net.kyori.fragment.feature.Feature;
+import net.kyori.fragment.feature.ProxiedFeature;
+import net.kyori.fragment.proxy.MethodHandleInvocationHandler;
 import net.kyori.fragment.proxy.Proxied;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class FeatureContextImpl implements FeatureContext {
-  protected final List<FeatureContextEntry<?>> features = new ArrayList<>();
+  protected final Multimap<Class<?>, FeatureContextEntry<?>> featuresByType = HashMultimap.create();
   protected final Table<Class<?>, String, FeatureContextEntry<?>> featuresById = HashBasedTable.create();
-  private final Map<Class<?>, FeatureList<?>> featureLists = new HashMap<>();
 
   @Override
-  public <F> @NonNull List<F> all(final @NonNull Class<F> type) {
-    return (List<F>) this.featureLists.computeIfAbsent(type, FeatureList::new);
-  }
-
-  private class FeatureList<F> extends ForwardingList<F> {
-    private final Class<F> type;
-    private @Nullable List<F> list;
-
-    FeatureList(final Class<F> type) {
-      this.type = type;
-    }
-
-    void invalidate() {
-      this.list = null;
-    }
-
-    @Override
-    protected List<F> delegate() {
-      if(this.list == null) {
-        this.list = FeatureContextImpl.this.features.stream()
-          .filter(feature -> feature.is(this.type))
-          .map(feature -> (F) feature.get())
-          .collect(Collectors.toList());
-      }
-      return this.list;
-    }
+  public <F> @NonNull Collection<F> all(final @NonNull Class<F> type) {
+    return (Collection<F>) this.featuresByType.get(type);
   }
 
   @Override
@@ -102,41 +80,26 @@ public class FeatureContextImpl implements FeatureContext {
     // This feature has an id, and can be referenced.
     if(id != null || flags.contains(Flag.ADD_WITHOUT_ID)) {
       this.feature(type, id).define(feature);
-      this.features(type).ifPresent(FeatureList::invalidate);
     }
 
     return feature;
   }
 
   protected <F> FeatureContextEntry<F> feature(final Class<F> type, final @Nullable String id) {
-    FeatureContextEntry<F> entry;
+    FeatureContextEntry<F> entry = null;
     if(id != null) {
       entry = (FeatureContextEntry<F>) this.featuresById.get(type, id);
-      if(entry == null) {
-        entry = this.createFeature(type, id);
-        this.featuresById.put(type, id, entry);
-      }
-      return entry;
-    } else {
-      entry = this.createFeature(type, id);
+    }
+    if(entry == null) {
+      entry = new FeatureContextEntry<>(type, id);
     }
     return entry;
-  }
-
-  private <F> FeatureContextEntry<F> createFeature(final Class<F> type, final @Nullable String id) {
-    final FeatureContextEntry<F> entry = new FeatureContextEntry<>(type, id);
-    this.features.add(entry);
-    return entry;
-  }
-
-  private <F> Optional<FeatureList<F>> features(final Class<F> type) {
-    return Optional.ofNullable((FeatureList<F>) this.featureLists.get(type));
   }
 
   @Override
   public @NonNull List<XMLException> validate() {
     final List<XMLException> exceptions = new ArrayList<>();
-    for(final FeatureContextEntry<?> entry : this.features) {
+    for(final FeatureContextEntry<?> entry : this.featuresByType.values()) {
       if(entry.virtual()) {
         entry.references.forEach(reference -> exceptions.add(new FeatureNotDefinedException(reference, "feature of type " + entry.toString() + " has not been defined")));
       }
@@ -147,7 +110,104 @@ public class FeatureContextImpl implements FeatureContext {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-      .addValue(this.features)
+      .addValue(this.featuresByType)
       .toString();
+  }
+
+  /**
+   * An entry in a feature context.
+   *
+   * @param <F> the feature type
+   */
+  public class FeatureContextEntry<F> {
+    /**
+     * The feature type.
+     */
+    private final Class<F> type;
+    /**
+     * The id used for referencing this feature.
+     */
+    private final @Nullable String id;
+    /**
+     * The feature.
+     */
+    private @MonotonicNonNull F feature;
+    /**
+     * The proxied feature.
+     */
+    private @Nullable F proxiedFeature;
+    /**
+     * A list of nodes referencing this feature.
+     */
+    final List<Node> references = new ArrayList<>();
+
+    FeatureContextEntry(final Class<F> type, final @Nullable String id) {
+      this.type = type;
+      this.id = id;
+
+      FeatureContextImpl.this.featuresByType.put(type, this);
+      if(id != null) {
+        FeatureContextImpl.this.featuresById.put(type, id, this);
+      }
+    }
+
+    boolean virtual() {
+      return this.feature == null;
+    }
+
+    FeatureContextEntry<F> ref(final Node node) {
+      this.references.add(node);
+      return this;
+    }
+
+    F get() {
+      if(this.feature != null) {
+        return this.feature;
+      }
+      return this.proxy();
+    }
+
+    void define(final F feature) {
+      if(!this.virtual() && this.feature != feature) {
+        throw new IllegalStateException(this.toString() + " already defined as " + this.feature + ", cannot redefine as " + feature);
+      }
+      this.feature = feature;
+    }
+
+    private F proxy() {
+      if(this.proxiedFeature == null) {
+        class ProxiedFeatureImpl extends MethodHandleInvocationHandler {
+          @Override
+          protected @Nullable Object object(final Method method) {
+            return FeatureContextEntry.this.feature();
+          }
+        }
+        this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), this.proxyClasses(), new ProxiedFeatureImpl());
+      }
+      return this.proxiedFeature;
+    }
+
+    private Class<?>[] proxyClasses() {
+      final List<Class<?>> classes = new ArrayList<>(2);
+      classes.add(this.type);
+      if(Feature.class.isAssignableFrom(this.type)) {
+        classes.add(ProxiedFeature.class);
+      } else {
+        classes.add(Proxied.class);
+      }
+      return classes.toArray(new Class<?>[classes.size()]);
+    }
+
+    private F feature() {
+      if(this.feature == null) {
+        throw new IllegalStateException("feature of type " + this.toString() + " has not been defined");
+      }
+      return this.feature;
+    }
+
+    @Override
+    public String toString() {
+      return this.type.getName() + (this.id != null ? (" with id '" + this.id + '\'') : "");
+    }
   }
 }

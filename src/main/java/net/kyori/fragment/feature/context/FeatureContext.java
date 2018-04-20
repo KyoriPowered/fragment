@@ -29,6 +29,7 @@ import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -38,13 +39,13 @@ import java.util.Set;
  */
 public interface FeatureContext {
   /**
-   * Gets a list of all features.
+   * Gets a collection of all features.
    *
    * @param type the feature type
    * @param <F> the feature type
    * @return the features
    */
-  <F> @NonNull List<F> all(final @NonNull Class<F> type);
+  <F> @NonNull Collection<F> all(final @NonNull Class<F> type);
 
   /**
    * Gets a feature.
