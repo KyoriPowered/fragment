@@ -36,6 +36,15 @@ import java.util.List;
  */
 public interface FeatureContext {
   /**
+   * Gets a list of all features.
+   *
+   * @param type the feature type
+   * @param <F> the feature type
+   * @return the features
+   */
+  <F> @NonNull List<F> all(final @NonNull Class<F> type);
+
+  /**
    * Gets a feature.
    *
    * <p>The returned feature may be proxied.</p>

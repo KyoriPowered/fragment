@@ -24,6 +24,7 @@
 package net.kyori.fragment.feature.context;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ForwardingList;
 import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.proxy.Proxied;
 import net.kyori.xml.XMLException;
@@ -35,9 +36,41 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FeatureContextImpl implements FeatureContext {
   protected final Map<String, FeatureContextEntry<?>> features = new HashMap<>();
+  protected final Map<Class<?>, FeatureList<?>> featureLists = new HashMap<>();
+
+  @Override
+  public <F> @NonNull List<F> all(final @NonNull Class<F> type) {
+    return (List<F>) this.featureLists.computeIfAbsent(type, FeatureList::new);
+  }
+
+  private class FeatureList<F> extends ForwardingList<F> {
+    private final Class<F> type;
+    private @Nullable List<F> list;
+
+    FeatureList(final Class<F> type) {
+      this.type = type;
+    }
+
+    void invalidate() {
+      this.list = null;
+    }
+
+    @Override
+    protected List<F> delegate() {
+      if(this.list == null) {
+        this.list = FeatureContextImpl.this.features.values().stream()
+          .filter(feature -> feature.is(this.type))
+          .map(feature -> (F) feature.get())
+          .collect(Collectors.toList());
+      }
+      return this.list;
+    }
+  }
 
   @Override
   public <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException {
@@ -65,6 +98,7 @@ public class FeatureContextImpl implements FeatureContext {
     // This feature has an id, and can be referenced.
     if(id != null) {
       this.feature(type, id).define(feature);
+      this.features(type).ifPresent(FeatureList::invalidate);
     }
 
     return feature;
@@ -72,6 +106,10 @@ public class FeatureContextImpl implements FeatureContext {
 
   protected <F> FeatureContextEntry<F> feature(final Class<F> type, final String id) {
     return (FeatureContextEntry<F>) this.features.computeIfAbsent(id, key -> new FeatureContextEntry<>(type, id));
+  }
+
+  protected <F> Optional<FeatureList<F>> features(final Class<F> type) {
+    return Optional.ofNullable((FeatureList<F>) this.featureLists.get(type));
   }
 
   @Override

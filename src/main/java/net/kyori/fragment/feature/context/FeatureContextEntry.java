@@ -67,6 +67,10 @@ public class FeatureContextEntry<F> {
     this.id = id;
   }
 
+  boolean is(final Class<?> type) {
+    return this.type.isAssignableFrom(type);
+  }
+
   boolean virtual() {
     return this.feature == null;
   }
