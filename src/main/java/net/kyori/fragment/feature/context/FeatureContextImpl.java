@@ -24,9 +24,10 @@
 package net.kyori.fragment.feature.context;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.feature.ProxiedFeature;
@@ -46,12 +47,12 @@ import java.util.List;
 import java.util.Set;
 
 public class FeatureContextImpl implements FeatureContext {
-  protected final Multimap<Class<?>, FeatureContextEntry<?>> featuresByType = HashMultimap.create();
+  protected final ListMultimap<Class<?>, FeatureContextEntry<?>> featuresByType = ArrayListMultimap.create();
   protected final Table<Class<?>, String, FeatureContextEntry<?>> featuresById = HashBasedTable.create();
 
   @Override
   public <F> @NonNull Collection<F> all(final @NonNull Class<F> type) {
-    return (Collection<F>) this.featuresByType.get(type);
+    return Lists.transform(this.featuresByType.get(type), input -> (F) input.get());
   }
 
   @Override
