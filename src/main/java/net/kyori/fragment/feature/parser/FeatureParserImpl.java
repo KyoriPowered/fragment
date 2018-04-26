@@ -21,17 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.parser.primitive;
+package net.kyori.fragment.feature.parser;
 
+import com.google.inject.TypeLiteral;
+import net.kyori.fragment.feature.Feature;
+import net.kyori.fragment.feature.context.FeatureContext;
+import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
-import net.kyori.xml.parser.PrimitiveParser;
+import net.kyori.xml.node.parser.Parser;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
-@Singleton
-public class BooleanParser implements PrimitiveParser<Boolean> {
+public class FeatureParserImpl<F extends Feature> implements FeatureParser<F> {
+  @Inject private TypeLiteral<F> type;
+  @Inject private Provider<FeatureContext> context;
+  @Inject private Parser<F> parser;
+
   @Override
-  public Boolean throwingParse(final Node node, final String string) {
-    return Boolean.parseBoolean(string);
+  public F throwingParse(final Node node) throws XMLException {
+    if(node.attribute(Feature.ID_ATTRIBUTE_NAME).isPresent()) {
+      return this.ref(node);
+    }
+    final F feature = this.parser.parse(node);
+    return this.context.get().add(this.type(), node, feature);
+  }
+
+  protected F ref(final Node node) throws XMLException {
+    return this.context.get().get(this.type(), node);
+  }
+
+  private Class<F> type() {
+    return (Class<F>) this.type.getRawType();
   }
 }

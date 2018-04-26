@@ -23,12 +23,26 @@
  */
 package net.kyori.fragment.parser.primitive.number;
 
+import com.google.inject.Scopes;
 import net.kyori.fragment.parser.ParserBinder;
 import net.kyori.violet.AbstractModule;
+import net.kyori.xml.node.parser.number.ByteParser;
+import net.kyori.xml.node.parser.number.DoubleParser;
+import net.kyori.xml.node.parser.number.FloatParser;
+import net.kyori.xml.node.parser.number.IntegerParser;
+import net.kyori.xml.node.parser.number.LongParser;
+import net.kyori.xml.node.parser.number.ShortParser;
 
 public final class NumberParserModule extends AbstractModule {
   @Override
   protected void configure() {
+    this.bind(ByteParser.class).in(Scopes.SINGLETON);
+    this.bind(DoubleParser.class).in(Scopes.SINGLETON);
+    this.bind(FloatParser.class).in(Scopes.SINGLETON);
+    this.bind(IntegerParser.class).in(Scopes.SINGLETON);
+    this.bind(LongParser.class).in(Scopes.SINGLETON);
+    this.bind(ShortParser.class).in(Scopes.SINGLETON);
+
     final ParserBinder parsers = new ParserBinder(this.binder());
     parsers.bindParser(Byte.class).to(ByteParser.class);
     parsers.bindParser(Double.class).to(DoubleParser.class);

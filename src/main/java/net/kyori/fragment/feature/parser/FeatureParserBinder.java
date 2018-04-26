@@ -21,24 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.parser.primitive.number;
+package net.kyori.fragment.feature.parser;
 
-import net.kyori.xml.XMLException;
-import net.kyori.xml.node.Node;
+import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
+import net.kyori.fragment.feature.Feature;
+import net.kyori.violet.FriendlyTypeLiteral;
+import net.kyori.violet.TypeArgument;
 
-import javax.inject.Singleton;
+public class FeatureParserBinder {
+  private final Binder binder;
 
-/**
- * Parses a {@link Node} into a {@link Float float}.
- */
-@Singleton
-public class FloatParser implements NumberParser<Float> {
-  @Override
-  public Float throwingParse(final Node node, final String string) throws XMLException {
-    try {
-      return Float.parseFloat(string);
-    } catch(final NumberFormatException e) {
-      throw new XMLException("Could not parse '" + string + "' as a float", e);
-    }
+  public FeatureParserBinder(final Binder binder) {
+    this.binder = binder;
+  }
+
+  public <F extends Feature> void bindFeatureParser(final Class<F> type) {
+    this.bindFeatureParser(TypeLiteral.get(type));
+  }
+
+  public <F extends Feature> void bindFeatureParser(final TypeLiteral<F> type) {
+    this.binder.bind(new FriendlyTypeLiteral<FeatureParser<F>>() {}.where(new TypeArgument<F>(type) {})).to(new FriendlyTypeLiteral<FeatureParserImpl<F>>() {}.where(new TypeArgument<F>(type) {}));
   }
 }

@@ -30,7 +30,7 @@ import net.kyori.lunar.EvenMoreObjects;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
-import net.kyori.xml.parser.Parser;
+import net.kyori.xml.node.parser.Parser;
 import org.jdom2.Element;
 
 import java.util.Map;

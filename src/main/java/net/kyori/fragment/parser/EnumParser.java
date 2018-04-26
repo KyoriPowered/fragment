@@ -26,7 +26,7 @@ package net.kyori.fragment.parser;
 import com.google.inject.TypeLiteral;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
-import net.kyori.xml.parser.Parser;
+import net.kyori.xml.node.parser.Parser;
 
 import java.util.HashMap;
 import java.util.Locale;

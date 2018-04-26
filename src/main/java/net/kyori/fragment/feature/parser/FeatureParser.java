@@ -24,7 +24,7 @@
 package net.kyori.fragment.feature.parser;
 
 import net.kyori.fragment.feature.Feature;
-import net.kyori.xml.parser.Parser;
+import net.kyori.xml.node.parser.Parser;
 
 public interface FeatureParser<F extends Feature> extends Parser<F> {
 }

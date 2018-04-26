@@ -28,7 +28,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import net.kyori.violet.FriendlyTypeLiteral;
 import net.kyori.violet.TypeArgument;
-import net.kyori.xml.parser.Parser;
+import net.kyori.xml.node.parser.Parser;
 
 public class ParserBinder {
   private final Binder binder;

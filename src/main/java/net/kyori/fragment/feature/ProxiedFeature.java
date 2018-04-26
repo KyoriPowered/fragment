@@ -23,7 +23,7 @@
  */
 package net.kyori.fragment.feature;
 
-import net.kyori.fragment.proxy.Proxied;
+import net.kyori.lunar.proxy.Proxied;
 
 /**
  * A feature that has been proxied.
