@@ -43,6 +43,9 @@ public class FeatureParserImpl<F extends Feature> implements FeatureParser<F> {
     if(node.attribute(Feature.REF_ATTRIBUTE_NAME).isPresent()) {
       return this.ref(node);
     }
+    if(node.attribute(Feature.ID_ATTRIBUTE_NAME).isPresent()) {
+      return this.ref(node);
+    }
     final F feature = this.parser.parse(node);
     return this.context.get().add(this.type(), node, feature);
   }
