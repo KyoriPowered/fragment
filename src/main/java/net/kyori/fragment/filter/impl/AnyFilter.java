@@ -25,8 +25,8 @@ package net.kyori.fragment.filter.impl;
 
 import net.kyori.fragment.filter.Filter;
 import net.kyori.fragment.filter.FilterQuery;
-import net.kyori.fragment.filter.FilterResponseResolver;
 import net.kyori.fragment.filter.FilterResponse;
+import net.kyori.fragment.filter.FilterResponseResolver;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;

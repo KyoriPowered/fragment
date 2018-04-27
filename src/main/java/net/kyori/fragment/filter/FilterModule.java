@@ -27,8 +27,8 @@ import net.kyori.fragment.filter.impl.AllFilterParser;
 import net.kyori.fragment.filter.impl.AnyFilterParser;
 import net.kyori.fragment.filter.impl.FilterReferenceParser;
 import net.kyori.fragment.filter.impl.NotFilterParser;
-import net.kyori.fragment.parser.ParserBinder;
 import net.kyori.violet.AbstractModule;
+import net.kyori.xml.node.parser.ParserBinder;
 
 public final class FilterModule extends AbstractModule {
   @Override
