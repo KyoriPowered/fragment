@@ -31,4 +31,8 @@ public interface Feature {
    * The name of the attribute used for creating, and retrieving, referable features.
    */
   String ID_ATTRIBUTE_NAME = "id";
+  /**
+   * The name of the attribute used for retrieving referable features.
+   */
+  String REF_ATTRIBUTE_NAME = "ref";
 }

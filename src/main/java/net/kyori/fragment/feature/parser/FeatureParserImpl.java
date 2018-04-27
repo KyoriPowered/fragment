@@ -40,7 +40,7 @@ public class FeatureParserImpl<F extends Feature> implements FeatureParser<F> {
 
   @Override
   public F throwingParse(final Node node) throws XMLException {
-    if(node.attribute(Feature.ID_ATTRIBUTE_NAME).isPresent()) {
+    if(node.attribute(Feature.REF_ATTRIBUTE_NAME).isPresent()) {
       return this.ref(node);
     }
     final F feature = this.parser.parse(node);
