@@ -27,6 +27,7 @@ import com.google.inject.TypeLiteral;
 import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.feature.context.FeatureContext;
 import net.kyori.xml.XMLException;
+import net.kyori.xml.node.AttributeNode;
 import net.kyori.xml.node.Node;
 import net.kyori.xml.node.parser.Parser;
 
@@ -40,10 +41,18 @@ public class FeatureParserImpl<F extends Feature> implements FeatureParser<F> {
 
   @Override
   public F throwingParse(final Node node) throws XMLException {
-    if(node.attribute(Feature.REF_ATTRIBUTE_NAME).isPresent()) {
-      return this.ref(node);
+    if(node instanceof AttributeNode) {
+      return this.parseAttribute(node);
     }
-    if(node.attribute(Feature.ID_ATTRIBUTE_NAME).isPresent()) {
+    return this.parseElement(node);
+  }
+
+  protected F parseAttribute(final Node node) {
+    return this.context.get().get(this.type(), node.value());
+  }
+
+  protected F parseElement(final Node node) throws XMLException {
+    if(node.attribute(Feature.REF_ATTRIBUTE_NAME).isPresent()) {
       return this.ref(node);
     }
     final F feature = this.parser.parse(node);
