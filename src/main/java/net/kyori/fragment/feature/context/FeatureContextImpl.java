@@ -180,7 +180,30 @@ public class FeatureContextImpl implements FeatureContext {
         class ProxiedFeatureImpl extends MethodHandleInvocationHandler {
           @Override
           protected @Nullable Object object(final Method method) {
+            if(this.selfForMethod(method)) {
+              return this;
+            }
             return FeatureContextEntry.this.feature();
+          }
+
+          private boolean selfForMethod(final Method thatMethod) {
+            try {
+              final Method thisMethod = this.getClass().getDeclaredMethod(thatMethod.getName(), thatMethod.getParameterTypes());
+              return thisMethod != null;
+            } catch(final NoSuchMethodException e) {
+              return false;
+            }
+          }
+
+          @Override
+          public String toString() {
+            final StringBuilder sb = new StringBuilder("Proxied ");
+            if(FeatureContextEntry.this.feature != null) {
+              sb.append(FeatureContextEntry.this.feature);
+            } else {
+              sb.append(FeatureContextEntry.this.type.getName()).append(" with id '").append(FeatureContextEntry.this.id).append('\'');
+            }
+            return sb.toString();
           }
         }
         this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), this.proxyClasses(), new ProxiedFeatureImpl());
