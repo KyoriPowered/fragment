@@ -25,7 +25,6 @@ package net.kyori.fragment.feature.parser;
 
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
-import net.kyori.fragment.feature.Feature;
 import net.kyori.violet.FriendlyTypeLiteral;
 import net.kyori.violet.TypeArgument;
 
@@ -36,11 +35,11 @@ public class FeatureParserBinder {
     this.binder = binder;
   }
 
-  public <F extends Feature> void bindFeatureParser(final Class<F> type) {
+  public <F> void bindFeatureParser(final Class<F> type) {
     this.bindFeatureParser(TypeLiteral.get(type));
   }
 
-  public <F extends Feature> void bindFeatureParser(final TypeLiteral<F> type) {
+  public <F> void bindFeatureParser(final TypeLiteral<F> type) {
     this.binder.bind(new FriendlyTypeLiteral<FeatureParser<F>>() {}.where(new TypeArgument<F>(type) {})).to(new FriendlyTypeLiteral<FeatureParserImpl<F>>() {}.where(new TypeArgument<F>(type) {}));
   }
 }

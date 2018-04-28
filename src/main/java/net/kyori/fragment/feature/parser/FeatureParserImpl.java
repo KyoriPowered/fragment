@@ -34,7 +34,7 @@ import net.kyori.xml.node.parser.Parser;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class FeatureParserImpl<F extends Feature> implements FeatureParser<F> {
+public class FeatureParserImpl<F> implements FeatureParser<F> {
   @Inject private TypeLiteral<F> type;
   @Inject private Provider<FeatureContext> context;
   @Inject private Parser<F> parser;

@@ -21,12 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.feature;
+package net.kyori.fragment.feature.context;
 
-import net.kyori.lunar.proxy.Proxied;
+import net.kyori.lunar.feature.FeatureContextEntryImpl;
+import net.kyori.xml.node.Node;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A feature that has been proxied.
+ * An entry in a feature context.
+ *
+ * @param <F> the feature type
  */
-public interface ProxiedFeature extends Feature, Proxied {
+public class FeatureContextEntry<F> extends FeatureContextEntryImpl<F> {
+  /**
+   * A list of nodes referencing this feature.
+   */
+  final List<Node> references = new ArrayList<>();
+
+  FeatureContextEntry(final Class<F> type, final @Nullable String id) {
+    super(type, id);
+  }
+
+  FeatureContextEntry<F> ref(final Node node) {
+    this.references.add(node);
+    return this;
+  }
 }
