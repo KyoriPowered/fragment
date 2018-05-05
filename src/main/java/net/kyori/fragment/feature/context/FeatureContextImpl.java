@@ -24,6 +24,7 @@
 package net.kyori.fragment.feature.context;
 
 import net.kyori.fragment.feature.Feature;
+import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,8 +34,8 @@ import java.util.List;
 
 public class FeatureContextImpl extends net.kyori.lunar.feature.FeatureContextImpl implements FeatureContext {
   @Override
-  public <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) throws XMLException {
-    final Node id = node.requireAttribute(Feature.ID_ATTRIBUTE_NAME);
+  public <F> @NonNull F get(final @NonNull Class<F> type, final @NonNull Node node) {
+    final Node id = node.attribute(Feature.REF_ATTRIBUTE_NAME).orElseGet(Exceptions.rethrowSupplier(() -> node.requireAttribute(Feature.ID_ATTRIBUTE_NAME)));
     return ((FeatureContextEntry<F>) this.entry(type, id.value())).ref(node).get();
   }
 
