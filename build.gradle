@@ -32,6 +32,7 @@ repositories {
 }
 
 dependencies {
+  compile 'net.kyori:feature:1.0.0-SNAPSHOT'
   compile 'net.kyori:lunar:1.0.6-SNAPSHOT'
   compile 'net.kyori:violet:1.0.0'
   compile 'net.kyori:xml:1.0.0-SNAPSHOT'

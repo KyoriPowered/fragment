@@ -41,6 +41,6 @@ public final class NotFilterParser implements Parser<NotFilter> {
 
   @Override
   public NotFilter throwingParse(final Node node) {
-    return new NotFilter(this.parser.parse(node.elements().one().need()));
+    return new NotFilter(this.parser.parse(node.elements().one().required()));
   }
 }

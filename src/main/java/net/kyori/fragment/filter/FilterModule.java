@@ -23,9 +23,9 @@
  */
 package net.kyori.fragment.filter;
 
+import net.kyori.feature.parser.FeatureDefinitionParserBinder;
 import net.kyori.fragment.filter.impl.AllFilterParser;
 import net.kyori.fragment.filter.impl.AnyFilterParser;
-import net.kyori.fragment.filter.impl.FilterReferenceParser;
 import net.kyori.fragment.filter.impl.NotFilterParser;
 import net.kyori.violet.AbstractModule;
 import net.kyori.xml.node.parser.ParserBinder;
@@ -34,10 +34,12 @@ public final class FilterModule extends AbstractModule {
   @Override
   protected void configure() {
     final ParserBinder parsers = new ParserBinder(this.binder());
-    parsers.bindParser(Filter.class).to(RootFilterParserImpl.class);
+    parsers.bindParser(Filter.class).to(FilterParser.class);
+
+    final FeatureDefinitionParserBinder features = new FeatureDefinitionParserBinder(this.binder());
+    features.bindFeatureParser(Filter.class).to(FilterParser.class);
 
     final FilterBinder filters = new FilterBinder(this.binder());
-    filters.bindFilter(Filter.REFERENCE_ID).to(FilterReferenceParser.class);
     filters.bindFilter("all").to(AllFilterParser.class);
     filters.bindFilter("any").to(AnyFilterParser.class);
     filters.bindFilter("not").to(NotFilterParser.class);

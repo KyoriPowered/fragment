@@ -23,15 +23,13 @@
  */
 package net.kyori.fragment.filter;
 
-import net.kyori.fragment.feature.Feature;
+import net.kyori.feature.FeatureDefinition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A filter.
  */
-public interface Filter extends Feature {
-  String REFERENCE_ID = "filter";
-
+public interface Filter extends FeatureDefinition {
   /**
    * Query this filter for a response.
    *

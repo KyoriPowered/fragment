@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <filters>
+    <test id="aaa">1024</test>
+
+    <any id="foo">
+      <ref id="aaa"/>
+    </any>
+  </filters>
+</root>

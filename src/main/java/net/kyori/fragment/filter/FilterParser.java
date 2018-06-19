@@ -21,29 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter.impl;
+package net.kyori.fragment.filter;
 
-import net.kyori.fragment.feature.context.FeatureContext;
-import net.kyori.fragment.filter.Filter;
+import net.kyori.feature.FeatureDefinitionContext;
+import net.kyori.feature.parser.AbstractInjectedFeatureDefinitionParser;
+import net.kyori.feature.reference.ReferenceFinder;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 import net.kyori.xml.node.parser.Parser;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
-public final class FilterReferenceParser implements Parser<Filter> {
-  private final Provider<FeatureContext> context;
+public final class FilterParser extends AbstractInjectedFeatureDefinitionParser<Filter> implements Parser<Filter> {
+  private static final ReferenceFinder REFERENCE_FINDER = ReferenceFinder.finder().refs("filter");
+  private final Map<String, Parser<? extends Filter>> parsers;
+  @Inject private Provider<FeatureDefinitionContext> featureContext;
 
   @Inject
-  private FilterReferenceParser(final Provider<FeatureContext> context) {
-    this.context = context;
+  private FilterParser(final Map<String, Parser<? extends Filter>> parsers) {
+    this.parsers = parsers;
   }
 
   @Override
-  public Filter throwingParse(final Node node) throws XMLException {
-    return this.context.get().get(Filter.class, node);
+  public Filter realThrowingParse(final Node node) throws XMLException {
+    final /* @Nullable */ Parser<? extends Filter> parser = this.parsers.get(node.name());
+    if(parser != null) {
+      return this.featureContext.get().define(Filter.class, node, parser.parse(node));
+    } else {
+      throw new XMLException("Could not find filter parser with name '" + node.name() + '\'');
+    }
+  }
+
+  @Override
+  protected @NonNull ReferenceFinder referenceFinder() {
+    return REFERENCE_FINDER;
   }
 }

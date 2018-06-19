@@ -30,13 +30,13 @@ import com.google.inject.multibindings.MapBinder;
 import net.kyori.xml.node.parser.Parser;
 
 public class FilterBinder {
-  private final Binder binder;
+  private final MapBinder<String, Parser<? extends Filter>> binder;
 
   public FilterBinder(final Binder binder) {
-    this.binder = binder;
+    this.binder = MapBinder.newMapBinder(binder, new TypeLiteral<String>() {}, new TypeLiteral<Parser<? extends Filter>>() {});
   }
 
   public LinkedBindingBuilder<Parser<? extends Filter>> bindFilter(final String key) {
-    return MapBinder.newMapBinder(this.binder, new TypeLiteral<String>() {}, new TypeLiteral<Parser<? extends Filter>>() {}).addBinding(key);
+    return this.binder.addBinding(key);
   }
 }
