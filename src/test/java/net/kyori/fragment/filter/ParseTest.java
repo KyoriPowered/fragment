@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParseTest {
-  private final Node node = EvenMoreObjects.get(Exceptions.rethrowSupplier(() -> {
+  private final Node node = EvenMoreObjects.make(Exceptions.rethrowSupplier(() -> {
     final Document document = DocumentFactory.builder()
       .builder(new SAXBuilder())
       .build()
