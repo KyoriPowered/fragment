@@ -30,6 +30,7 @@ import net.kyori.xml.node.parser.Parser;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+@Deprecated
 @Singleton
 public final class NotFilterParser implements Parser<NotFilter> {
   private final Parser<Filter> parser;

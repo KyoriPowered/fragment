@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * A filter that returns the inverse response.
  */
+@Deprecated
 public final class NotFilter extends AbstractSingleFilter {
   public NotFilter(final @NonNull Filter filter) {
     super(filter);

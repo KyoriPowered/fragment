@@ -26,5 +26,6 @@ package net.kyori.fragment.filter;
 /**
  * A filter query.
  */
+@Deprecated
 public interface FilterQuery {
 }

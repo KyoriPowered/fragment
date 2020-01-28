@@ -25,6 +25,7 @@ package net.kyori.fragment.filter;
 
 import java.util.List;
 
+@Deprecated
 public class FilterResponseResolver {
   // The quick response value is returned immediately if encountered while querying filters.
   private final FilterResponse quickResponse;

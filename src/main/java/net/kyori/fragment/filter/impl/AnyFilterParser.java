@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+@Deprecated
 @Singleton
 public final class AnyFilterParser implements Parser<AnyFilter> {
   private final Parser<Filter> parser;

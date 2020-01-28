@@ -21,48 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
+package net.kyori.feature.parser;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.kyori.feature.FeatureDefinition;
+import net.kyori.xml.node.parser.Parser;
 
 /**
- * A response from querying a {@link Filter}.
+ * A feature definition parser.
+ *
+ * @param <D> the feature type
  */
 @Deprecated
-public enum FilterResponse {
-  ALLOW {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return DENY;
-    }
-  },
-  DENY {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ALLOW;
-    }
-  },
-  ABSTAIN {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ABSTAIN;
-    }
-  };
-
-  /**
-   * Gets the inverse response.
-   *
-   * @return the inverse response
-   */
-  public abstract @NonNull FilterResponse inverse();
-
-  /**
-   * Gets a response from a boolean.
-   *
-   * @param bool the boolean
-   * @return the response
-   */
-  public static @NonNull FilterResponse from(final boolean bool) {
-    return bool ? ALLOW : DENY;
-  }
+public interface FeatureDefinitionParser<D extends FeatureDefinition> extends Parser<D> {
 }

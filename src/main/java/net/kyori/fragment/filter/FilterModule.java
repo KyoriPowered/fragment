@@ -30,6 +30,7 @@ import net.kyori.fragment.filter.impl.NotFilterParser;
 import net.kyori.violet.AbstractModule;
 import net.kyori.xml.node.parser.ParserBinder;
 
+@Deprecated
 public final class FilterModule extends AbstractModule {
   @Override
   protected void configure() {

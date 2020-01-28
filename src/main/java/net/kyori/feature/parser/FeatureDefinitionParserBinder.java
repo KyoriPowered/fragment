@@ -21,41 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
+package net.kyori.feature.parser;
 
+import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
+import com.google.inject.binder.AnnotatedBindingBuilder;
 import net.kyori.feature.FeatureDefinition;
+import net.kyori.violet.FriendlyTypeLiteral;
+import net.kyori.violet.TypeArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A filter.
+ * A feature definition parser binder.
  */
 @Deprecated
-public interface Filter extends FeatureDefinition {
-  /**
-   * Query this filter for a response.
-   *
-   * @param query the query
-   * @return the response
-   */
-  @NonNull FilterResponse query(final @NonNull FilterQuery query);
+public class FeatureDefinitionParserBinder {
+  private final Binder binder;
 
-  /**
-   * Query this filter and return {@code true} if {@link FilterResponse#ALLOW allowed} and {@code false} otherwise.
-   *
-   * @param query the query
-   * @return {@code true} if allowed, {@code false} otherwise
-   */
-  default boolean allowed(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.ALLOW;
+  public FeatureDefinitionParserBinder(final Binder binder) {
+    this.binder = binder;
   }
 
   /**
-   * Query this filter and return {@code true} if {@link FilterResponse#DENY denied} and {@code false} otherwise.
+   * Creates a binding builder for binding a feature definition parser for {@code D}.
    *
-   * @param query the query
-   * @return {@code true} if denied, {@code false} otherwise
+   * @param type the type
+   * @param <D> the type
+   * @return the parser binding binder
    */
-  default boolean denied(final @NonNull FilterQuery query) {
-    return this.query(query) == FilterResponse.DENY;
+  public <D extends FeatureDefinition> @NonNull AnnotatedBindingBuilder<FeatureDefinitionParser<D>> bindFeatureParser(final Class<D> type) {
+    return this.bindFeatureParser(TypeLiteral.get(type));
+  }
+
+  /**
+   * Creates a binding builder for binding a feature definition parser for {@code D}.
+   *
+   * @param type the type
+   * @param <D> the type
+   * @return the parser binding binder
+   */
+  public <D extends FeatureDefinition> @NonNull AnnotatedBindingBuilder<FeatureDefinitionParser<D>> bindFeatureParser(final TypeLiteral<D> type) {
+    return this.binder.bind(new FriendlyTypeLiteral<FeatureDefinitionParser<D>>() {}.where(new TypeArgument<D>(type) {}));
   }
 }

@@ -26,6 +26,7 @@ package net.kyori.fragment.filter.impl;
 import net.kyori.fragment.filter.Filter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@Deprecated
 public abstract class AbstractSingleFilter implements Filter {
   protected final @NonNull Filter filter;
 

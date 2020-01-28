@@ -21,48 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
+package net.kyori.feature;
 
 /**
- * A response from querying a {@link Filter}.
+ * A feature definition.
  */
 @Deprecated
-public enum FilterResponse {
-  ALLOW {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return DENY;
-    }
-  },
-  DENY {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ALLOW;
-    }
-  },
-  ABSTAIN {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ABSTAIN;
-    }
-  };
-
+public interface FeatureDefinition {
   /**
-   * Gets the inverse response.
-   *
-   * @return the inverse response
+   * The name of the attribute used for creating, and retrieving, referable features.
    */
-  public abstract @NonNull FilterResponse inverse();
-
+  String ID_ATTRIBUTE_NAME = "id";
   /**
-   * Gets a response from a boolean.
-   *
-   * @param bool the boolean
-   * @return the response
+   * The name of the element used for referencing referable features.
    */
-  public static @NonNull FilterResponse from(final boolean bool) {
-    return bool ? ALLOW : DENY;
-  }
+  String REF_ELEMENT_NAME = "ref";
 }

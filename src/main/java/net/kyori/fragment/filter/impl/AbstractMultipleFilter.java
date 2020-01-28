@@ -28,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
+@Deprecated
 public abstract class AbstractMultipleFilter implements Filter {
   protected final @NonNull List<Filter> filters;
 

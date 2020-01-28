@@ -21,46 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
+package net.kyori.feature.parser;
 
-import net.kyori.feature.FeatureDefinitionContext;
-import net.kyori.feature.parser.AbstractInjectedFeatureDefinitionParser;
-import net.kyori.feature.reference.ReferenceFinder;
+import com.google.inject.TypeLiteral;
+import net.kyori.feature.FeatureDefinition;
+import net.kyori.violet.FriendlyTypeLiteral;
+import net.kyori.violet.TypeArgument;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 import net.kyori.xml.node.parser.Parser;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Map;
-
 import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
+/**
+ * An implementation of a feature parser that delegates to {@code Parser<D>}.
+ *
+ * @param <D> the feature type
+ */
 @Deprecated
-@Singleton
-public final class FilterParser extends AbstractInjectedFeatureDefinitionParser<Filter> implements Parser<Filter> {
-  private static final ReferenceFinder REFERENCE_FINDER = ReferenceFinder.finder().refs("filter");
-  private final Map<String, Parser<? extends Filter>> parsers;
-  @Inject private Provider<FeatureDefinitionContext> featureContext;
+public class DelegatingFeatureDefinitionParser<D extends FeatureDefinition> extends AbstractInjectedFeatureDefinitionParser<D> {
+  /**
+   * A parser for {@code F}.
+   */
+  private @Inject Parser<D> parser;
 
-  @Inject
-  private FilterParser(final Map<String, Parser<? extends Filter>> parsers) {
-    this.parsers = parsers;
+  public static <D extends FeatureDefinition> @NonNull TypeLiteral<? extends FeatureDefinitionParser<D>> binding(final TypeLiteral<D> type) {
+    return new FriendlyTypeLiteral<DelegatingFeatureDefinitionParser<D>>() {}.where(new TypeArgument<D>(type) {});
   }
 
   @Override
-  public Filter realThrowingParse(final Node node) throws XMLException {
-    final /* @Nullable */ Parser<? extends Filter> parser = this.parsers.get(node.name());
-    if(parser != null) {
-      return this.featureContext.get().define(Filter.class, node, parser.parse(node));
-    } else {
-      throw new XMLException("Could not find filter parser with name '" + node.name() + '\'');
-    }
-  }
-
-  @Override
-  protected @NonNull ReferenceFinder referenceFinder() {
-    return REFERENCE_FINDER;
+  protected D realThrowingParse(final @NonNull Node node) throws XMLException {
+    final D definition = this.parser.parse(node);
+    return this.context().define(this.type(), node, definition);
   }
 }

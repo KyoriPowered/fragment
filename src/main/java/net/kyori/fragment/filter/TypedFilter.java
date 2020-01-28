@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <Q> the query type
  */
+@Deprecated
 public interface TypedFilter<Q extends FilterQuery> extends Filter {
   /**
    * Tests if this filter accepts the query.

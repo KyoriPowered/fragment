@@ -21,48 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.fragment.filter;
+package net.kyori.feature.reference;
 
+import com.google.common.collect.Sets;
+import net.kyori.feature.FeatureDefinition;
+import net.kyori.xml.node.ElementNode;
+import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jdom2.Element;
 
-/**
- * A response from querying a {@link Filter}.
- */
+import java.util.Collections;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
+
 @Deprecated
-public enum FilterResponse {
-  ALLOW {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return DENY;
-    }
-  },
-  DENY {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ALLOW;
-    }
-  },
-  ABSTAIN {
-    @Override
-    public @NonNull FilterResponse inverse() {
-      return ABSTAIN;
-    }
-  };
+final class ReferenceFinderImpl implements ReferenceFinder {
+  static final ReferenceFinder FINDER = new ReferenceFinderImpl(Collections.singleton(FeatureDefinition.REF_ELEMENT_NAME));
+  private final Set<String> refElements;
 
-  /**
-   * Gets the inverse response.
-   *
-   * @return the inverse response
-   */
-  public abstract @NonNull FilterResponse inverse();
+  private ReferenceFinderImpl(final Set<String> refElements) {
+    this.refElements = refElements;
+  }
 
-  /**
-   * Gets a response from a boolean.
-   *
-   * @param bool the boolean
-   * @return the response
-   */
-  public static @NonNull FilterResponse from(final boolean bool) {
-    return bool ? ALLOW : DENY;
+  @Override
+  public boolean test(final @NonNull Node node) {
+    if(node instanceof ElementNode) {
+      final Element element = ((ElementNode) node).element();
+      return this.refElements.contains(element.getName())
+        && element.getAttributes().size() == 1
+        && FeatureDefinition.ID_ATTRIBUTE_NAME.equals(element.getAttributes().get(0).getName());
+    }
+    return false;
+  }
+
+  @Override
+  public ReferenceFinder refs(final @NonNull Set<String> refElements) {
+    requireNonNull(refElements, "ref elements");
+    return new ReferenceFinderImpl(Sets.union(this.refElements, refElements));
   }
 }

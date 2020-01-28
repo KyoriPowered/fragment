@@ -29,6 +29,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import net.kyori.xml.node.parser.Parser;
 
+@Deprecated
 public class FilterBinder {
   private final MapBinder<String, Parser<? extends Filter>> binder;
 

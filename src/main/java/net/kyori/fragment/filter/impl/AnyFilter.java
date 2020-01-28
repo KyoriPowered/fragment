@@ -34,6 +34,7 @@ import java.util.List;
 /**
  * A filter that responds with {@link FilterResponse#ALLOW} if any of its children respond with {@link FilterResponse#ALLOW}.
  */
+@Deprecated
 public final class AnyFilter extends AbstractMultipleFilter {
   private static final FilterResponseResolver RESOLVER = new FilterResponseResolver(FilterResponse.ALLOW, FilterResponse.DENY);
 
